@@ -25,15 +25,13 @@ Manage Fleet ruleset for lab 7 - CS 462
       parent_eci re#(.*)#
       eci re#(.*)#
         setting(sub_name, fleet_eci, vehicle_eci)
-    fired {
-      event:send(
-        { "eci": fleet_eci, "eid": "subscription",
-          "domain": "wrangler", "type": "subscription",
-          "attrs": { "name": sub_name + "-sub",
-                    "Rx_role": "fleet",
-                    "Tx_role": "vehicle",
-                    "channel_type": "subscription",
-                    "wellKnown_Tx": vehicle_eci } } )
-    }
+    event:send(
+      { "eci": fleet_eci, "eid": "subscription",
+        "domain": "wrangler", "type": "subscription",
+        "attrs": { "name": sub_name + "-sub",
+                  "Rx_role": "fleet",
+                  "Tx_role": "vehicle",
+                  "channel_type": "subscription",
+                  "wellKnown_Tx": vehicle_eci } } )
   }
 }
