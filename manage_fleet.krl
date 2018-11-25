@@ -7,6 +7,14 @@ Manage Fleet ruleset for lab 7 - CS 462
     author "Bo Pace"
     logging on
     use module io.picolabs.wrangler alias wrangler
+    use module io.picolabs.subscription alias Subscriptions
+    shares vehicles
+  }
+
+  global {
+    vehicles = function() {
+      Subscriptions:established
+    }
   }
 
   rule create_vehicle {
@@ -14,6 +22,7 @@ Manage Fleet ruleset for lab 7 - CS 462
     fired {
       raise wrangler event "child_creation"
         attributes { "name": vehicle_name,
+                     "type": "vehicle",
                      "color": "#ffb347",
                      "rids": "track_trips" }
     }
