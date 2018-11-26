@@ -13,7 +13,7 @@ Manage Fleet ruleset for lab 7 - CS 462
 
   global {
     vehicles = function() {
-      Subscriptions:established
+      Subscriptions:established("Tx_role","vehicle")
     }
   }
 
@@ -38,9 +38,20 @@ Manage Fleet ruleset for lab 7 - CS 462
       { "eci": fleet_eci, "eid": "subscription",
         "domain": "wrangler", "type": "subscription",
         "attrs": { "name": sub_name + "-sub",
+                  "vehicle_name": sub_name,
                   "Rx_role": "fleet",
                   "Tx_role": "vehicle",
                   "channel_type": "subscription",
                   "wellKnown_Tx": vehicle_eci } } )
+  }
+
+  rule save_sub_id {
+    select when wrangler subscription_added
+      name re#(.*)#
+      Id re#(.*)#
+        setting(sub_name, sub_id)
+    fired {
+      ent:subs := ent:subs.defaultsTo([]).append({"name": sub_name, "id": sub_id}).klog("subs so far: ")
+    }
   }
 }

@@ -40,12 +40,11 @@ Track Trips ruleset for lab 6 - CS 462
   rule autoAccept {
     select when wrangler inbound_pending_subscription_added
     pre{
-      attributes = event:attrs().klog("subcription :");
+      attributes = event:attrs
     }
     always{
       raise wrangler event "pending_subscription_approval"
           attributes attributes;
-      log info "auto accepted subcription.";
     }
   }
 }
