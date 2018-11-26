@@ -28,7 +28,7 @@ Manage Fleet ruleset for lab 7 - CS 462
         attributes { "name": vehicle_name,
                      "type": "vehicle",
                      "color": "#ffb347",
-                     "rids": "track_trips" }
+                     "rids": ["track_trips", "trip_store"] }
     }
   }
 
@@ -67,7 +67,10 @@ Manage Fleet ruleset for lab 7 - CS 462
     if sub_id then noop();
     fired {
       raise wrangler event "subscription_cancellation"
-        attributes {"Id": sub_id}
+        attributes {"Id": sub_id};
+      raise wrangler event "child_deletion"
+        attributes {"name": name};
+      ent:subs := ent:subs.delete(name + "-sub")
     }
   }
 }

@@ -13,7 +13,7 @@ Track Trips ruleset for lab 6 - CS 462
   global {
     long_trip = 99
 
-    test_trips_function = function() {
+    trips = function() {
       trip_store:trips()
     }
   }
