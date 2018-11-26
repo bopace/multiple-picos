@@ -15,6 +15,10 @@ Manage Fleet ruleset for lab 7 - CS 462
     vehicles = function() {
       Subscriptions:established("Tx_role","vehicle")
     }
+
+    get_subscription_by_name = function(name)  {
+      ent:subs
+    }
   }
 
   rule create_vehicle {
@@ -51,7 +55,7 @@ Manage Fleet ruleset for lab 7 - CS 462
       Id re#(.*)#
         setting(sub_name, sub_id)
     fired {
-      ent:subs := ent:subs.defaultsTo([]).append({"name": sub_name, "id": sub_id}).klog("subs so far: ")
+      ent:subs := ent:subs.defaultsTo({}).put(sub_name, sub_id)
     }
   }
 }
