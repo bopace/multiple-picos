@@ -17,7 +17,7 @@ Manage Fleet ruleset for lab 7 - CS 462
     }
 
     get_subscription_by_name = function(name)  {
-      ent:subs
+      ent:subs{name + "-sub"}
     }
   }
 
@@ -56,6 +56,18 @@ Manage Fleet ruleset for lab 7 - CS 462
         setting(sub_name, sub_id)
     fired {
       ent:subs := ent:subs.defaultsTo({}).put(sub_name, sub_id)
+    }
+  }
+
+  rule delete_vehicle {
+    select when car unneeded_vehicle name re#(.*)# setting(name)
+    pre {
+      sub_id = get_subscription_by_name(name)
+    }
+    if sub_id then noop();
+    fired {
+      raise wrangler event "subscription_cancellation"
+        attributes {"Id": sub_id}
     }
   }
 }
