@@ -8,7 +8,7 @@ Manage Fleet ruleset for lab 7 - CS 462
     logging on
     use module io.picolabs.wrangler alias wrangler
     use module io.picolabs.subscription alias Subscriptions
-    shares vehicles
+    shares vehicles, generate_report_via_functions
   }
 
   global {
@@ -18,6 +18,18 @@ Manage Fleet ruleset for lab 7 - CS 462
 
     get_subscription_by_name = function(name)  {
       ent:subs{name + "-sub"}
+    }
+
+    generate_report_via_functions = function() {
+      ent:vehicles.map(function(vehicle_name) {
+        vehicle = wrangler:children(vehicle_name).klog("here's the vehicle: ");
+        base_url = "http://localhost:8080/sky/cloud/";
+        vehicle_eci = vehicle[0]{"eci"};
+        trips_function = "/track_trips/trips";
+        full_url = base_url + vehicle_eci + trips_function;
+        response = http:get(full_url).klog("test: ");
+        response
+      })
     }
   }
 
@@ -47,6 +59,9 @@ Manage Fleet ruleset for lab 7 - CS 462
                   "Tx_role": "vehicle",
                   "channel_type": "subscription",
                   "wellKnown_Tx": vehicle_eci } } )
+    fired {
+      ent:vehicles := ent:vehicles.defaultsTo([]).append([sub_name])
+    }
   }
 
   rule save_sub_id {
@@ -70,7 +85,9 @@ Manage Fleet ruleset for lab 7 - CS 462
         attributes {"Id": sub_id};
       raise wrangler event "child_deletion"
         attributes {"name": name};
-      ent:subs := ent:subs.delete(name + "-sub")
+      ent:subs := ent:subs.delete(name + "-sub");
+      name_index = ent:vehicles.index(name);
+      ent:vehicles := ent:vehicles.splice(name_index, 1)
     }
   }
 }
