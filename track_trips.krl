@@ -7,7 +7,7 @@ Track Trips ruleset for lab 6 - CS 462
     author "Bo Pace"
     logging on
     use module trip_store
-    shares test_trips_function
+    shares trips
   }
 
   global {
