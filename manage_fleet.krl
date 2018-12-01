@@ -21,14 +21,19 @@ Manage Fleet ruleset for lab 7 - CS 462
     }
 
     generate_report_via_functions = function() {
+      report = {};
       ent:vehicles.map(function(vehicle_name) {
-        vehicle = wrangler:children(vehicle_name).klog("here's the vehicle: ");
+        vehicle = wrangler:children(vehicle_name)[0].klog("here's the vehicle: ");
+        vehicle_id = vehicle{"id"};
         base_url = "http://localhost:8080/sky/cloud/";
-        vehicle_eci = vehicle[0]{"eci"};
+        vehicle_eci = vehicle{"eci"};
         trips_function = "/track_trips/trips";
         full_url = base_url + vehicle_eci + trips_function;
-        response = http:get(full_url).klog("test: ");
-        response
+        response = {"trips" : http:get(full_url){"content"}.decode()}
+          .put("vehicle_name", vehicle{"name"})
+          .klog("test: ");
+        vehicle_report = {}.put(vehicle_id, response);
+        vehicle_report.klog("vehicle_report: ")
       })
     }
   }
