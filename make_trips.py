@@ -7,7 +7,7 @@ vehicle_ecis = []
 for vehicle in vehicle_ecis:
   num_of_trips = randint(1, 10)
   trips = []
-  for i in repeat(None, 10):
+  for i in repeat(None, num_of_trips):
     trips.append(str(randint(1,999)))
 
   for trip in trips:
