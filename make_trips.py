@@ -2,7 +2,7 @@ import requests
 from random import randint
 from itertools import repeat
 
-vehicle_ecis = ['PaFrLai14uzt6Yxn138RdV']
+vehicle_ecis = []
 
 for vehicle in vehicle_ecis:
   num_of_trips = randint(1, 10)
