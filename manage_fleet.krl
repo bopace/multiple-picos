@@ -98,10 +98,30 @@ Manage Fleet ruleset for lab 7 - CS 462
 
   rule scatter_gather {
     select when report scatter_gather
+    pre {
+      report_id = random:uuid()
+      attributes = event:attrs.put("report_id", report_id)
+    }
+    fired {
+      raise explicit event "start_report"
+        attributes attributes;
+    }
+  }
+
+  rule start_report {
+    select when explicit start_report
       foreach ent:vehicles setting(vehicle)
         pre {
-          vehicle_eci = wrangler:children(vehicle)[0]{"eci"}.klog("vehicle eci: ")
+          my_eci = meta:eci
+          vehicle = wrangler:children(vehicle)[0].klog("vehicle: ")
+          my_attrs = event:attrs
+            .put("report_to_eci", my_eci)
+            .put("vehicle_name", vehicle{"name"})
         }
-        event:send({ "eci" : vehicle_eci, "domain" : "report", "type" : "get_trips" })
+        event:send({ "eci" : vehicle{"eci"}, "domain" : "report", "type" : "get_trips", "attrs" : my_attrs })
+  }
+
+  rule get_reported_trips {
+    select when report reported_trips
   }
 }
