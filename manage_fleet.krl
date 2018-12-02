@@ -95,4 +95,13 @@ Manage Fleet ruleset for lab 7 - CS 462
       ent:vehicles := ent:vehicles.splice(name_index, 1)
     }
   }
+
+  rule scatter_gather {
+    select when report scatter_gather
+      foreach vehicles() setting(vehicle)
+        pre {
+          vehicle_eci = wrangler:children(vehicle_name)[0]{"eci"}.klog("vehicle thingy: ")
+        }
+        event:send({ "eci" : vehicle_eci, "domain" : "report", "type" : "get_trips" })
+  }
 }
