@@ -47,4 +47,11 @@ Track Trips ruleset for lab 6 - CS 462
           attributes attributes;
     }
   }
+
+  rule report_trips {
+    select when report get_trips
+    fired {
+      trips().klog("all trips: ")
+    }
+  }
 }

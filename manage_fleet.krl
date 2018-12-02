@@ -98,9 +98,9 @@ Manage Fleet ruleset for lab 7 - CS 462
 
   rule scatter_gather {
     select when report scatter_gather
-      foreach vehicles() setting(vehicle)
+      foreach ent:vehicles setting(vehicle)
         pre {
-          vehicle_eci = wrangler:children(vehicle_name)[0]{"eci"}.klog("vehicle thingy: ")
+          vehicle_eci = wrangler:children(vehicle)[0]{"eci"}.klog("vehicle eci: ")
         }
         event:send({ "eci" : vehicle_eci, "domain" : "report", "type" : "get_trips" })
   }
