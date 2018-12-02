@@ -51,9 +51,14 @@ Track Trips ruleset for lab 6 - CS 462
   rule report_trips {
     select when report get_trips
     pre {
-      trips_to_report = trips()
+      vehicle_name = event:attr("vehicle_name").klog("track_trips vehicle name: ")
+      vehicle_id = event:attr("vehicle_id").klog("track_trips vehicle id: ")
+      trips_to_report = trips().klog("trips!!!!!!!!!! ")
       fleet_eci = event:attr("report_to_eci")
-      my_attrs = event:attrs
+      my_attrs = {}
+        .put("report_id", event:attr("report_id"))
+        .put("vehicle_name", event:attr("vehicle_name"))
+        .put("vehicle_id", event:attr("vehicle_id"))
         .put("trips", trips_to_report)
     }
     event:send({ "eci" : fleet_eci, "domain" : "report", "type" : "reported_trips", "attrs" : my_attrs })

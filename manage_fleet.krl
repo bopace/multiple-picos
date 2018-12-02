@@ -105,7 +105,7 @@ Manage Fleet ruleset for lab 7 - CS 462
     fired {
       raise explicit event "start_report"
         attributes attributes
-          if (not ent:currently_reporting);
+          if (not ent:currently_reporting)
     }
   }
 
@@ -115,10 +115,13 @@ Manage Fleet ruleset for lab 7 - CS 462
         pre {
           my_eci = meta:eci
           vehicle = wrangler:children(vehicle)[0].klog("vehicle: ")
-          my_attrs = event:attrs
+          asdf = vehicle{"name"}.klog("vehicle name: ")
+          asdf = vehicle{"id"}.klog("vehicle id: ")
+          my_attrs = {}
+            .put("report_id", event:attr("report_id"))
             .put("report_to_eci", my_eci)
             .put("vehicle_name", vehicle{"name"})
-            .put("vehicle_name", vehicle{"id"})
+            .put("vehicle_id", vehicle{"id"})
         }
         event:send({ "eci" : vehicle{"eci"}, "domain" : "report", "type" : "get_trips", "attrs" : my_attrs })
         fired {
@@ -129,9 +132,9 @@ Manage Fleet ruleset for lab 7 - CS 462
   rule get_reported_trips {
     select when report reported_trips
     fired {
-      vehicle_id = event:attr("vehicle_id");
-      vehicle_name = event:attr("vehicle_name");
-      trips = event:attr("trip");
+      vehicle_id = event:attr("vehicle_id").klog("reported vehicle id: ");
+      vehicle_name = event:attr("vehicle_name").klog("reported vehicle name: ");
+      trips = event:attr("trips").klog("reported trips: ");
       ent:current_count := ent:current_count.defaultsTo(0) + 1;
       vehicle_report = {}
         .put("name", vehicle_name)
