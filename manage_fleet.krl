@@ -8,7 +8,7 @@ Manage Fleet ruleset for lab 7 - CS 462
     logging on
     use module io.picolabs.wrangler alias wrangler
     use module io.picolabs.subscription alias Subscriptions
-    shares vehicles, generate_report_via_functions, stop_report
+    shares vehicles, generate_report_via_functions, stop_report, get_last_5_reports
   }
 
   global {
@@ -16,8 +16,19 @@ Manage Fleet ruleset for lab 7 - CS 462
       Subscriptions:established("Tx_role","vehicle")
     }
 
+    get_vehicle_count = function() {
+      ent:vehicles.length()
+    }
+
     get_subscription_by_name = function(name)  {
       ent:subs{name + "-sub"}
+    }
+
+    get_last_5_reports = function() {
+      len = ent:all_reports.length();
+      (len < 5) =>
+        ent:all_reports |
+        ent:all_reports.slice(len - 5, len - 1)
     }
 
     generate_report_via_functions = function() {
@@ -115,8 +126,6 @@ Manage Fleet ruleset for lab 7 - CS 462
         pre {
           my_eci = meta:eci
           vehicle = wrangler:children(vehicle)[0].klog("vehicle: ")
-          asdf = vehicle{"name"}.klog("vehicle name: ")
-          asdf = vehicle{"id"}.klog("vehicle id: ")
           my_attrs = {}
             .put("report_id", event:attr("report_id"))
             .put("report_to_eci", my_eci)
@@ -141,7 +150,43 @@ Manage Fleet ruleset for lab 7 - CS 462
         .put("trips", trips);
 
       ent:current_report := ent:current_report.defaultsTo({})
-        .put(vehicle_id, vehicle_report)
+        .put(vehicle_id, vehicle_report);
+
+      attributes = {}
+        .put("report", ent:current_report)
+        .put("reporting_count", ent:current_count)
+        .put("vehicle_count", get_vehicle_count());
+
+      raise explicit event "check_report"
+        attributes attributes
+    }
+  }
+
+  rule check_report {
+    select when explicit check_report
+    fired {
+      raise explicit event "finalize_report"
+        attributes {
+          "reporting_count" : event:attr("reporting_count"),
+          "vehicle_count" : get_vehicle_count(),
+          "report" : event:attr("report")
+        }
+          if (event:attr("reporting_count") == get_vehicle_count())
+    }
+  }
+
+  rule finalize_report {
+    select when explicit finalize_report
+    fired {
+      final_report = event:attr("report")
+        .put("reporting_count", event:attr("reporting_count"))
+        .put("vehicle_count", event:attr("vehicle_count"));
+      ent:all_reports := ent:all_reports
+        .defaultsTo([])
+        .append(event:attr("report"));
+      ent:currently_reporting := false;
+      ent:current_report := {};
+      ent:current_count := 0
     }
   }
 
