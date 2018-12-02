@@ -2,7 +2,7 @@ ruleset trip_store {
   meta {
     name "Trip Store"
     description <<
-Trip Store ruleset for lab 6 - CS 462
+Trip Store ruleset for lab 7 - CS 462
 >>
     author "Bo Pace"
     logging on

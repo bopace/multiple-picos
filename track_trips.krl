@@ -2,7 +2,7 @@ ruleset track_trips {
   meta {
     name "Track Trips"
     description <<
-Track Trips ruleset for lab 6 - CS 462
+Track Trips ruleset for lab 7 - CS 462
 >>
     author "Bo Pace"
     logging on
