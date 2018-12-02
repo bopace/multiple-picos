@@ -177,13 +177,14 @@ Manage Fleet ruleset for lab 7 - CS 462
 
   rule finalize_report {
     select when explicit finalize_report
+    send_directive("report", event:attr("report"))
     fired {
       final_report = event:attr("report")
         .put("reporting_count", event:attr("reporting_count"))
         .put("vehicle_count", event:attr("vehicle_count"));
       ent:all_reports := ent:all_reports
         .defaultsTo([])
-        .append(event:attr("report"));
+        .append(final_report);
       ent:currently_reporting := false;
       ent:current_report := {};
       ent:current_count := 0
