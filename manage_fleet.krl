@@ -8,7 +8,7 @@ Manage Fleet ruleset for lab 7 - CS 462
     logging on
     use module io.picolabs.wrangler alias wrangler
     use module io.picolabs.subscription alias Subscriptions
-    shares vehicles, generate_report_via_functions
+    shares vehicles, generate_report_via_functions, stop_report
   }
 
   global {
@@ -104,7 +104,8 @@ Manage Fleet ruleset for lab 7 - CS 462
     }
     fired {
       raise explicit event "start_report"
-        attributes attributes;
+        attributes attributes
+          if (not ent:currently_reporting);
     }
   }
 
@@ -117,11 +118,36 @@ Manage Fleet ruleset for lab 7 - CS 462
           my_attrs = event:attrs
             .put("report_to_eci", my_eci)
             .put("vehicle_name", vehicle{"name"})
+            .put("vehicle_name", vehicle{"id"})
         }
         event:send({ "eci" : vehicle{"eci"}, "domain" : "report", "type" : "get_trips", "attrs" : my_attrs })
+        fired {
+          ent:currently_reporting := true
+        }
   }
 
   rule get_reported_trips {
     select when report reported_trips
+    fired {
+      vehicle_id = event:attr("vehicle_id");
+      vehicle_name = event:attr("vehicle_name");
+      trips = event:attr("trip");
+      ent:current_count := ent:current_count.defaultsTo(0) + 1;
+      vehicle_report = {}
+        .put("name", vehicle_name)
+        .put("trips", trips);
+
+      ent:current_report := ent:current_report.defaultsTo({})
+        .put(vehicle_id, vehicle_report)
+    }
+  }
+
+  rule stop_report {
+    select when report stop
+    fired {
+      ent:currently_reporting := false;
+      ent:current_report := {};
+      ent:current_count := 0
+    }
   }
 }

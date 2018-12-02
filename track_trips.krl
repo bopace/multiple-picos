@@ -53,7 +53,8 @@ Track Trips ruleset for lab 6 - CS 462
     pre {
       trips_to_report = trips()
       fleet_eci = event:attr("report_to_eci")
-      my_attrs = { "trips": trips_to_report }
+      my_attrs = event:attrs
+        .put("trips", trips_to_report)
     }
     event:send({ "eci" : fleet_eci, "domain" : "report", "type" : "reported_trips", "attrs" : my_attrs })
   }
